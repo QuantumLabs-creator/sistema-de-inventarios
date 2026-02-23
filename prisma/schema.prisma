@@ -6,9 +6,188 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movements Movement[]
+  orders    Order[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+  WAREHOUSE
+}
+
+// ============================================
+// INVENTORY CONFIGURATION
+// ============================================
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  contact     String?
+  email       String?
+  phone       String?
+  address     String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  products    Product[]
+  orders      Order[]
+
+  @@map("suppliers")
+}
+
+model UnitOfMeasure {
+  id        String   @id @default(cuid())
+  name      String   @unique // Example: UNIT, KG, LITER, BOX
+  symbol    String?
+  active    Boolean  @default(true)
+
+  products  Product[]
+
+  @@map("units_of_measure")
+}
+
+// ============================================
+// PRODUCTS AND STOCK
+// ============================================
+
+model Product {
+  id              String   @id @default(cuid())
+  code            String   @unique // Barcode or SKU
+  name            String
+  description     String?
+  purchasePrice   Decimal  @db.Decimal(10, 2)
+  salePrice       Decimal  @db.Decimal(10, 2)
+  minStock        Int      @default(0) // Reorder point
+  currentStock    Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id])
+  
+  supplierId      String?
+  supplier        Supplier? @relation(fields: [supplierId], references: [id])
+  
+  unitId          String
+  unit            UnitOfMeasure @relation(fields: [unitId], references: [id])
+
+  movements       Movement[]
+  orderDetails    OrderDetail[]
+
+  @@index([categoryId])
+  @@index([supplierId])
+  @@map("products")
+}
+
+// ============================================
+// MOVEMENTS (INVENTORY TRACKING)
+// ============================================
+
+model Movement {
+  id           String   @id @default(cuid())
+  type         MovementType
+  quantity     Int
+  stockBefore  Int
+  stockAfter   Int
+  reason       String?
+  createdAt    DateTime @default(now())
+
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  
+  userId       String
+  user         User @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+  @@map("movements")
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RETURN
+}
+
+// ============================================
+// PURCHASE ORDERS
+// ============================================
+
+model Order {
+  id           String   @id @default(cuid())
+  orderNumber  String   @unique // Generated order number
+  status       OrderStatus @default(PENDING)
+  total        Decimal  @db.Decimal(12, 2) @default(0)
+  orderDate    DateTime @default(now())
+  deliveryDate DateTime?
+  observations String?
+  createdAt    DateTime @default(now())
+
+  supplierId   String
+  supplier     Supplier @relation(fields: [supplierId], references: [id])
+
+  userId       String
+  user         User @relation(fields: [userId], references: [id])
+
+  details      OrderDetail[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  RECEIVED
+  CANCELLED
+}
+
+model OrderDetail {
+  id        String  @id @default(cuid())
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(12, 2)
+
+  orderId   String
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_details")
 }
