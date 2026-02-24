@@ -102,15 +102,11 @@ const navTree: NavNode[] = [
     icon: L(Package, 18),
     items: [
       {
-        href: "/products",
+        href: "dashboard/products",
         label: "Lista de Productos",
         icon: L(Package, 18),
       },
-      {
-        href: "/products/new",
-        label: "Nuevo Producto",
-        icon: L(Plus, 18),
-      },
+
     ],
   },
   {
@@ -136,17 +132,12 @@ const navTree: NavNode[] = [
     key: "users",
     label: "Usuarios",
     icon: L(Users, 18),
-  
+
     items: [
       {
-        href: "/users",
-        label: "Lista de Usuarios",
+        href: "dashboard/users/",
+        label: "Gestion de Usuarios",
         icon: L(Users, 18),
-      },
-      {
-        href: "/users/new",
-        label: "Nuevo Usuario",
-        icon: L(UserPlus, 18),
       },
     ],
   },
