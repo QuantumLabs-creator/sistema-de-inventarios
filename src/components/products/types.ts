@@ -22,7 +22,7 @@ export type Product = {
     // Para pintar en tabla (si tu API lo incluye)
     category?: { id: string; name: string } | null;
     supplier?: { id: string; name: string } | null;
-    unit?: { id: string; name: string; symbol?: string | null } | null;
+    unit?: { id: string; name: string; symbol: string | null } | null;
 };
 
 export type ProductDraft = Omit<Product, "id" | "code"> & {

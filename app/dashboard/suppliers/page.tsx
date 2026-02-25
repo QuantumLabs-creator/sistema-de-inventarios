@@ -47,24 +47,11 @@ function uiToApi(d: SupplierDraft) {
   };
 }
 
-function useDebouncedValue<T>(value: T, delay = 300) {
-  const [v, setV] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setV(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return v;
-}
-
 export default function SuppliersPage() {
   const [data, setData] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [q, setQ] = useState("");
-  const qDebounced = useDebouncedValue(q, 350);
-
-  const [active, setActive] = useState<string>("");
-
+  // paginación (opcional)
   const [page, setPage] = useState(1);
   const pageSize = 200;
 
@@ -78,19 +65,19 @@ export default function SuppliersPage() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [initialDraft, setInitialDraft] = useState<SupplierDraft>(emptySupplierDraft);
+  const [initialDraft, setInitialDraft] =
+    useState<SupplierDraft>(emptySupplierDraft);
 
   async function loadSuppliers() {
     setLoading(true);
     try {
       const sp = new URLSearchParams();
-      if (qDebounced.trim()) sp.set("q", qDebounced.trim());
-      if (active.trim()) sp.set("active", active.trim());
-
       sp.set("page", String(page));
       sp.set("pageSize", String(pageSize));
 
-      const res = await fetch(`/api/suppliers?${sp.toString()}`, { cache: "no-store" });
+      const res = await fetch(`/api/suppliers?${sp.toString()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error("No se pudo cargar proveedores");
 
       const json = (await res.json()) as ApiList;
@@ -108,7 +95,7 @@ export default function SuppliersPage() {
   useEffect(() => {
     loadSuppliers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qDebounced, page, active]);
+  }, [page]);
 
   function onCreate() {
     setMode("create");
@@ -223,7 +210,9 @@ export default function SuppliersPage() {
         toast.dismiss(tId);
         toast.success("Cambios guardados", { description: draft.name });
 
-        setData((prev) => prev.map((x) => (x.id === editingId ? apiToUi(updated) : x)));
+        setData((prev) =>
+          prev.map((x) => (x.id === editingId ? apiToUi(updated) : x))
+        );
         setOpen(false);
       }
     } catch (e: any) {
@@ -241,27 +230,14 @@ export default function SuppliersPage() {
             {loading ? "Cargando..." : `${meta.total} proveedor(es)`}
           </div>
         </div>
-
-        <div className="flex gap-2">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar..."
-            className="w-full sm:w-[260px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10"
-          />
-          <select
-            value={active}
-            onChange={(e) => setActive(e.target.value)}
-            className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10"
-          >
-            <option value="">Todos</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
-        </div>
       </div>
 
-      <SuppliersTable data={data} onCreate={onCreate} onEdit={onEdit} onDelete={onDelete} />
+      <SuppliersTable
+        data={data}
+        onCreate={onCreate}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
 
       <SuppliersModal
         open={open}

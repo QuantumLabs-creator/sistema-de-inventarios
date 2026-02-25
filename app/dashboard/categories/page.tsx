@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-
-
 import type { Category, CategoryDraft } from "@/src/components/categories/types";
 import { emptyCategoryDraft } from "@/src/components/categories/types";
 import CategoriesTable from "@/src/components/categories/CategoryTable";
@@ -16,7 +14,7 @@ type ApiCategory = {
   name: string;
   description: string | null;
   active: boolean;
-  createdAt?: string; // si tu API lo manda
+  createdAt?: string;
 };
 
 type ApiList = {
@@ -42,26 +40,11 @@ function uiToApi(d: CategoryDraft) {
   };
 }
 
-// debounce simple
-function useDebouncedValue<T>(value: T, delay = 300) {
-  const [v, setV] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setV(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return v;
-}
-
 export default function CategoriesPage() {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // búsqueda + paginación + filtros
-  const [q, setQ] = useState("");
-  const qDebounced = useDebouncedValue(q, 350);
-
-  const [active, setActive] = useState<string>(""); // "" | "true" | "false"
-
+  // paginación (opcional)
   const [page, setPage] = useState(1);
   const pageSize = 200;
 
@@ -75,20 +58,19 @@ export default function CategoriesPage() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [initialDraft, setInitialDraft] = useState<CategoryDraft>(emptyCategoryDraft);
+  const [initialDraft, setInitialDraft] =
+    useState<CategoryDraft>(emptyCategoryDraft);
 
   async function loadCategories() {
     setLoading(true);
     try {
       const sp = new URLSearchParams();
-
-      if (qDebounced.trim()) sp.set("q", qDebounced.trim());
-      if (active.trim()) sp.set("active", active.trim());
-
       sp.set("page", String(page));
       sp.set("pageSize", String(pageSize));
 
-      const res = await fetch(`/api/categories?${sp.toString()}`, { cache: "no-store" });
+      const res = await fetch(`/api/categories?${sp.toString()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error("No se pudo cargar categorías");
 
       const json = (await res.json()) as ApiList;
@@ -106,7 +88,7 @@ export default function CategoriesPage() {
   useEffect(() => {
     loadCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qDebounced, page, active]);
+  }, [page]);
 
   function onCreate() {
     setMode("create");
@@ -240,25 +222,6 @@ export default function CategoriesPage() {
           <div className="text-xs opacity-70">
             {loading ? "Cargando..." : `${meta.total} categoría(s)`}
           </div>
-        </div>
-
-        {/* 🔎 Filtros simples (opcional) */}
-        <div className="flex gap-2">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar..."
-            className="w-full sm:w-[260px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10"
-          />
-          <select
-            value={active}
-            onChange={(e) => setActive(e.target.value)}
-            className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10"
-          >
-            <option value="">Todos</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
         </div>
       </div>
 

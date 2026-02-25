@@ -58,9 +58,16 @@ function apiToUi(p: ApiProduct): Product {
 
     active: !!p.active,
 
-    categoryId: p.categoryId,
+    categoryId: p.categoryId ?? "",
     supplierId: p.supplierId ?? null,
-    unitId: p.unitId,
+    unitId: p.unitId ?? "",
+
+    // ✅ objetos para pintar en tabla
+    category: p.category ? { id: p.category.id, name: p.category.name } : null,
+    supplier: p.supplier ? { id: p.supplier.id, name: p.supplier.name } : null,
+    unit: p.unit
+      ? { id: p.unit.id, name: p.unit.name, symbol: p.unit.symbol ?? null }
+      : null,
   };
 }
 

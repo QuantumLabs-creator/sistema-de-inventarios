@@ -98,17 +98,27 @@ const navTree: NavNode[] = [
   {
     type: "group",
     key: "products",
-    label: "Productos",
+    label: "Inventario",
     icon: L(Package, 18),
     items: [
       {
-        href: "dashboard/products",
-        label: "Lista de Productos",
+        href: "/dashboard/products",
+        label: "Gestionar Productos",
         icon: L(Package, 18),
       },
       {
-        href: "dashboard/categories",
-        label: "Lista de Productos",
+        href: "/dashboard/categories",
+        label: "Gestionar Categorias",
+        icon: L(Package, 18),
+      },
+       {
+        href: "/dashboard/units",
+        label: "Gestionar Unidades",
+        icon: L(Package, 18),
+      },
+       {
+        href: "/dashboard/suppliers",
+        label: "Gestionar Proveedores",
         icon: L(Package, 18),
       },
 
@@ -140,7 +150,7 @@ const navTree: NavNode[] = [
 
     items: [
       {
-        href: "dashboard/users/",
+        href: "/dashboard/users/",
         label: "Gestion de Usuarios",
         icon: L(Users, 18),
       },
@@ -227,7 +237,7 @@ export default function Sidebar({
           />
           {!collapsed && (
             <div className="leading-tight">
-              <div className="text-base font-semibold tracking-tight">Inventarios</div>
+              <div className="text-base font-semibold tracking-tight">Gestion de Inventarios</div>
               <div className="text-xs opacity-70">Dashboard • 2026</div>
             </div>
           )}

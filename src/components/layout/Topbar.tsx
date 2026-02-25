@@ -28,7 +28,7 @@ export default function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
           <div>
             <div className="text-sm font-semibold leading-4">
-              Ges-Memoryx
+              Gestión - Inventario
             </div>
             <div className="text-[11px] opacity-70 leading-4">
               Panel de administración
