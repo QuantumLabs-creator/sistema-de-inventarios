@@ -106,6 +106,11 @@ const navTree: NavNode[] = [
         label: "Lista de Productos",
         icon: L(Package, 18),
       },
+      {
+        href: "dashboard/categories",
+        label: "Lista de Productos",
+        icon: L(Package, 18),
+      },
 
     ],
   },
