@@ -18,6 +18,9 @@ export type Product = {
     categoryId: string;
     supplierId: string | null;
     unitId: string;
+    minSalePrice?: string | null;
+    maxSalePrice?: string | null;
+
 
     // Para pintar en tabla (si tu API lo incluye)
     category?: { id: string; name: string } | null;
@@ -44,6 +47,9 @@ export const emptyProductDraft: ProductDraft = {
     categoryId: "",
     supplierId: null,
     unitId: "",
+
+    minSalePrice: null,
+    maxSalePrice: null,
 
     category: null,
     supplier: null,

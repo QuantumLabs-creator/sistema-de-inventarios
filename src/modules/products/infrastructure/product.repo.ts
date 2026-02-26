@@ -49,6 +49,9 @@ function mapProduct(
     purchasePrice: p.purchasePrice,
     salePrice: p.salePrice,
 
+    minSalePrice: p.minSalePrice ?? null,
+    maxSalePrice: p.maxSalePrice ?? null,
+
     minStock: p.minStock,
     currentStock: p.currentStock,
 
@@ -74,6 +77,10 @@ function safeStr(v?: string | null) {
 function parseActiveFilter(v?: string): boolean | undefined {
   if (v === undefined || v === null || String(v).trim() === "") return undefined;
   return normalizeBoolean(v, true);
+}
+
+function isBlank(v: unknown) {
+  return v === undefined || v === null || String(v).trim() === "";
 }
 
 /** ===================== Repository ===================== */
@@ -169,8 +176,31 @@ export class PrismaProductRepository implements ProductRepository {
       const purchasePrice = normalizeMoney(input.purchasePrice, "purchasePrice");
       const salePrice = normalizeMoney(input.salePrice, "salePrice");
 
-      const minStock = normalizeInt(input.minStock, 0) ?? 0;
-      const currentStock = normalizeInt(input.currentStock, 0) ?? 0;
+      const minSalePrice = isBlank(input.minSalePrice)
+        ? null
+        : normalizeMoney(input.minSalePrice, "minSalePrice");
+
+      const maxSalePrice = isBlank(input.maxSalePrice)
+        ? null
+        : normalizeMoney(input.maxSalePrice, "maxSalePrice");
+
+      // ✅ validaciones de rango
+      if (minSalePrice && (minSalePrice as any).greaterThan(salePrice as any)) {
+        throw new Error("minSalePrice no puede ser mayor que salePrice");
+      }
+      if (maxSalePrice && (maxSalePrice as any).lessThan(salePrice as any)) {
+        throw new Error("maxSalePrice no puede ser menor que salePrice");
+      }
+      if (
+        minSalePrice &&
+        maxSalePrice &&
+        (minSalePrice as any).greaterThan(maxSalePrice as any)
+      ) {
+        throw new Error("minSalePrice no puede ser mayor que maxSalePrice");
+      }
+
+      const minStock = Math.max(0, normalizeInt(input.minStock, 0));
+      const currentStock = Math.max(0, normalizeInt(input.currentStock, 0));
 
       const active = normalizeBoolean(input.active, true);
 
@@ -188,6 +218,8 @@ export class PrismaProductRepository implements ProductRepository {
           description: description ?? null,
           purchasePrice,
           salePrice,
+          minSalePrice,
+          maxSalePrice,
           minStock,
           currentStock,
           active,
@@ -209,10 +241,7 @@ export class PrismaProductRepository implements ProductRepository {
 
       const data: Prisma.ProductUpdateInput = {};
 
-      // ✅ Recomiendo NO permitir editar code
-      // si lo quieres permitir, deja este bloque.
-      
-
+      // ===== Campos simples
       if (input.name !== undefined) {
         const v = normalizeText(input.name);
         if (!v) throw new Error("name inválido");
@@ -223,30 +252,62 @@ export class PrismaProductRepository implements ProductRepository {
         data.description = normalizeText(input.description) ?? null;
       }
 
+      // ===== Precios (para validación cruzada)
+      const nextSalePrice =
+        input.salePrice !== undefined
+          ? normalizeMoney(input.salePrice, "salePrice")
+          : existing.salePrice;
+
+      const nextMinSale =
+        input.minSalePrice !== undefined
+          ? isBlank(input.minSalePrice)
+            ? null
+            : normalizeMoney(input.minSalePrice, "minSalePrice")
+          : existing.minSalePrice ?? null;
+
+      const nextMaxSale =
+        input.maxSalePrice !== undefined
+          ? isBlank(input.maxSalePrice)
+            ? null
+            : normalizeMoney(input.maxSalePrice, "maxSalePrice")
+          : existing.maxSalePrice ?? null;
+
+      // ✅ validaciones de rango con valores finales
+      if (nextMinSale && (nextMinSale as any).greaterThan(nextSalePrice as any)) {
+        throw new Error("minSalePrice no puede ser mayor que salePrice");
+      }
+      if (nextMaxSale && (nextMaxSale as any).lessThan(nextSalePrice as any)) {
+        throw new Error("maxSalePrice no puede ser menor que salePrice");
+      }
+      if (nextMinSale && nextMaxSale && (nextMinSale as any).greaterThan(nextMaxSale as any)) {
+        throw new Error("minSalePrice no puede ser mayor que maxSalePrice");
+      }
+
       if (input.purchasePrice !== undefined) {
         data.purchasePrice = normalizeMoney(input.purchasePrice, "purchasePrice");
       }
 
       if (input.salePrice !== undefined) {
-        data.salePrice = normalizeMoney(input.salePrice, "salePrice");
+        data.salePrice = nextSalePrice;
       }
 
+      // ✅ aplicar min/max si vienen
+      if (input.minSalePrice !== undefined) data.minSalePrice = nextMinSale;
+      if (input.maxSalePrice !== undefined) data.maxSalePrice = nextMaxSale;
+
       if (input.minStock !== undefined) {
-        const v = normalizeInt(input.minStock, 0);
-        if (v === null) throw new Error("minStock inválido");
-        data.minStock = v;
+        data.minStock = Math.max(0, normalizeInt(input.minStock, 0));
       }
 
       if (input.currentStock !== undefined) {
-        const v = normalizeInt(input.currentStock, 0);
-        if (v === null) throw new Error("currentStock inválido");
-        data.currentStock = v;
+        data.currentStock = Math.max(0, normalizeInt(input.currentStock, 0));
       }
 
       if (input.active !== undefined) {
         data.active = normalizeBoolean(input.active, true);
       }
 
+      // ===== Relaciones
       if (input.categoryId !== undefined) {
         const v = String(input.categoryId ?? "").trim();
         if (!v) throw new Error("categoryId inválido");

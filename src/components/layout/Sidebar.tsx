@@ -131,12 +131,12 @@ const navTree: NavNode[] = [
     icon: L(ArrowUpDown, 18),
     items: [
       {
-        href: "/movements/new",
+        href: "/dashboard/movements/new",
         label: "Registrar Movimiento",
         icon: L(Plus, 18),
       },
       {
-        href: "/movements/history",
+        href: "/dashboard/movements/history",
         label: "Historial",
         icon: L(History, 18),
       },

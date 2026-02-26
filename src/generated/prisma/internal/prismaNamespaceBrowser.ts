@@ -136,6 +136,8 @@ export const ProductScalarFieldEnum = {
   salePrice: 'salePrice',
   minStock: 'minStock',
   currentStock: 'currentStock',
+  minSalePrice: 'minSalePrice',
+  maxSalePrice: 'maxSalePrice',
   active: 'active',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -154,6 +156,7 @@ export const MovementScalarFieldEnum = {
   stockBefore: 'stockBefore',
   stockAfter: 'stockAfter',
   reason: 'reason',
+  unitPrice: 'unitPrice',
   createdAt: 'createdAt',
   productId: 'productId',
   userId: 'userId'

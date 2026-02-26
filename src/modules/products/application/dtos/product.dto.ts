@@ -32,6 +32,9 @@ export interface CreateProductDTO {
   minStock?: unknown;
   currentStock?: unknown;
 
+  minSalePrice?: unknown;
+  maxSalePrice?: unknown;
+
   active?: unknown;
 
   categoryId: string;
@@ -48,6 +51,9 @@ export interface UpdateProductDTO {
 
   minStock?: unknown;
   currentStock?: unknown;
+
+  minSalePrice?: unknown;
+  maxSalePrice?: unknown;
 
   active?: unknown;
 

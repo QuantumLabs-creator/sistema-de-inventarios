@@ -58,7 +58,7 @@ export function assertCreateProductInput(input: unknown): asserts input is Creat
 }
 
 export function normalizeCreateProduct(input: CreateProductInput) {
-  
+
   const name = toStr(input.name);
   if (!name) throw new Error("name requerido");
 
@@ -77,9 +77,29 @@ export function normalizeCreateProduct(input: CreateProductInput) {
   const currentStock = Math.max(0, normalizeInt(input.currentStock, 0));
 
   const active = normalizeBoolean(input.active, true);
+  const minSalePrice =
+    input.minSalePrice !== undefined && String(input.minSalePrice ?? "").trim() !== ""
+      ? normalizeMoney(input.minSalePrice, "minSalePrice")
+      : null;
+
+  const maxSalePrice =
+    input.maxSalePrice !== undefined && String(input.maxSalePrice ?? "").trim() !== ""
+      ? normalizeMoney(input.maxSalePrice, "maxSalePrice")
+      : null;
+
+  // ✅ validaciones de rango
+  if (minSalePrice && minSalePrice.greaterThan(salePrice)) {
+    throw new Error("minSalePrice no puede ser mayor que salePrice");
+  }
+  if (maxSalePrice && maxSalePrice.lessThan(salePrice)) {
+    throw new Error("maxSalePrice no puede ser menor que salePrice");
+  }
+  if (minSalePrice && maxSalePrice && minSalePrice.greaterThan(maxSalePrice)) {
+    throw new Error("minSalePrice no puede ser mayor que maxSalePrice");
+  }
 
   return {
-   
+
     name,
     description: normalizeText(input.description),
     purchasePrice,
@@ -90,12 +110,14 @@ export function normalizeCreateProduct(input: CreateProductInput) {
     categoryId,
     supplierId,
     unitId,
+    minSalePrice,
+    maxSalePrice,
   };
 }
 
 export function normalizeUpdateProduct(dto: Partial<CreateProductInput>): UpdateProductInput {
   const out: UpdateProductInput = {};
-  
+
   if (dto.name !== undefined) out.name = toStr(dto.name);
   if (dto.description !== undefined) out.description = normalizeText(dto.description);
 
@@ -110,6 +132,20 @@ export function normalizeUpdateProduct(dto: Partial<CreateProductInput>): Update
   if (dto.categoryId !== undefined) out.categoryId = toStr(dto.categoryId);
   if (dto.supplierId !== undefined) out.supplierId = normalizeText(dto.supplierId) ?? null;
   if (dto.unitId !== undefined) out.unitId = toStr(dto.unitId);
+
+  if (dto.minSalePrice !== undefined) {
+    out.minSalePrice =
+      String(dto.minSalePrice ?? "").trim() === ""
+        ? null
+        : normalizeMoney(dto.minSalePrice, "minSalePrice");
+  }
+
+  if (dto.maxSalePrice !== undefined) {
+    out.maxSalePrice =
+      String(dto.maxSalePrice ?? "").trim() === ""
+        ? null
+        : normalizeMoney(dto.maxSalePrice, "maxSalePrice");
+  }
 
   return out;
 }

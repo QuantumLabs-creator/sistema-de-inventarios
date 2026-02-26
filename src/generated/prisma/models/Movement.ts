@@ -30,12 +30,14 @@ export type MovementAvgAggregateOutputType = {
   quantity: number | null
   stockBefore: number | null
   stockAfter: number | null
+  unitPrice: runtime.Decimal | null
 }
 
 export type MovementSumAggregateOutputType = {
   quantity: number | null
   stockBefore: number | null
   stockAfter: number | null
+  unitPrice: runtime.Decimal | null
 }
 
 export type MovementMinAggregateOutputType = {
@@ -45,6 +47,7 @@ export type MovementMinAggregateOutputType = {
   stockBefore: number | null
   stockAfter: number | null
   reason: string | null
+  unitPrice: runtime.Decimal | null
   createdAt: Date | null
   productId: string | null
   userId: string | null
@@ -57,6 +60,7 @@ export type MovementMaxAggregateOutputType = {
   stockBefore: number | null
   stockAfter: number | null
   reason: string | null
+  unitPrice: runtime.Decimal | null
   createdAt: Date | null
   productId: string | null
   userId: string | null
@@ -69,6 +73,7 @@ export type MovementCountAggregateOutputType = {
   stockBefore: number
   stockAfter: number
   reason: number
+  unitPrice: number
   createdAt: number
   productId: number
   userId: number
@@ -80,12 +85,14 @@ export type MovementAvgAggregateInputType = {
   quantity?: true
   stockBefore?: true
   stockAfter?: true
+  unitPrice?: true
 }
 
 export type MovementSumAggregateInputType = {
   quantity?: true
   stockBefore?: true
   stockAfter?: true
+  unitPrice?: true
 }
 
 export type MovementMinAggregateInputType = {
@@ -95,6 +102,7 @@ export type MovementMinAggregateInputType = {
   stockBefore?: true
   stockAfter?: true
   reason?: true
+  unitPrice?: true
   createdAt?: true
   productId?: true
   userId?: true
@@ -107,6 +115,7 @@ export type MovementMaxAggregateInputType = {
   stockBefore?: true
   stockAfter?: true
   reason?: true
+  unitPrice?: true
   createdAt?: true
   productId?: true
   userId?: true
@@ -119,6 +128,7 @@ export type MovementCountAggregateInputType = {
   stockBefore?: true
   stockAfter?: true
   reason?: true
+  unitPrice?: true
   createdAt?: true
   productId?: true
   userId?: true
@@ -218,6 +228,7 @@ export type MovementGroupByOutputType = {
   stockBefore: number
   stockAfter: number
   reason: string | null
+  unitPrice: runtime.Decimal | null
   createdAt: Date
   productId: string
   userId: string
@@ -253,6 +264,7 @@ export type MovementWhereInput = {
   stockBefore?: Prisma.IntFilter<"Movement"> | number
   stockAfter?: Prisma.IntFilter<"Movement"> | number
   reason?: Prisma.StringNullableFilter<"Movement"> | string | null
+  unitPrice?: Prisma.DecimalNullableFilter<"Movement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Movement"> | Date | string
   productId?: Prisma.StringFilter<"Movement"> | string
   userId?: Prisma.StringFilter<"Movement"> | string
@@ -267,6 +279,7 @@ export type MovementOrderByWithRelationInput = {
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -284,6 +297,7 @@ export type MovementWhereUniqueInput = Prisma.AtLeast<{
   stockBefore?: Prisma.IntFilter<"Movement"> | number
   stockAfter?: Prisma.IntFilter<"Movement"> | number
   reason?: Prisma.StringNullableFilter<"Movement"> | string | null
+  unitPrice?: Prisma.DecimalNullableFilter<"Movement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Movement"> | Date | string
   productId?: Prisma.StringFilter<"Movement"> | string
   userId?: Prisma.StringFilter<"Movement"> | string
@@ -298,6 +312,7 @@ export type MovementOrderByWithAggregationInput = {
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -318,6 +333,7 @@ export type MovementScalarWhereWithAggregatesInput = {
   stockBefore?: Prisma.IntWithAggregatesFilter<"Movement"> | number
   stockAfter?: Prisma.IntWithAggregatesFilter<"Movement"> | number
   reason?: Prisma.StringNullableWithAggregatesFilter<"Movement"> | string | null
+  unitPrice?: Prisma.DecimalNullableWithAggregatesFilter<"Movement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Movement"> | Date | string
   productId?: Prisma.StringWithAggregatesFilter<"Movement"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Movement"> | string
@@ -330,6 +346,7 @@ export type MovementCreateInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutMovementsInput
   user: Prisma.UserCreateNestedOneWithoutMovementsInput
@@ -342,6 +359,7 @@ export type MovementUncheckedCreateInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   productId: string
   userId: string
@@ -354,6 +372,7 @@ export type MovementUpdateInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutMovementsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutMovementsNestedInput
@@ -366,6 +385,7 @@ export type MovementUncheckedUpdateInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -378,6 +398,7 @@ export type MovementCreateManyInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   productId: string
   userId: string
@@ -390,6 +411,7 @@ export type MovementUpdateManyMutationInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -400,6 +422,7 @@ export type MovementUncheckedUpdateManyInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -422,6 +445,7 @@ export type MovementCountOrderByAggregateInput = {
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  unitPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -431,6 +455,7 @@ export type MovementAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
+  unitPrice?: Prisma.SortOrder
 }
 
 export type MovementMaxOrderByAggregateInput = {
@@ -440,6 +465,7 @@ export type MovementMaxOrderByAggregateInput = {
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  unitPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -452,6 +478,7 @@ export type MovementMinOrderByAggregateInput = {
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  unitPrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -461,6 +488,7 @@ export type MovementSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   stockBefore?: Prisma.SortOrder
   stockAfter?: Prisma.SortOrder
+  unitPrice?: Prisma.SortOrder
 }
 
 export type MovementCreateNestedManyWithoutUserInput = {
@@ -558,6 +586,7 @@ export type MovementCreateWithoutUserInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutMovementsInput
 }
@@ -569,6 +598,7 @@ export type MovementUncheckedCreateWithoutUserInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   productId: string
 }
@@ -609,6 +639,7 @@ export type MovementScalarWhereInput = {
   stockBefore?: Prisma.IntFilter<"Movement"> | number
   stockAfter?: Prisma.IntFilter<"Movement"> | number
   reason?: Prisma.StringNullableFilter<"Movement"> | string | null
+  unitPrice?: Prisma.DecimalNullableFilter<"Movement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Movement"> | Date | string
   productId?: Prisma.StringFilter<"Movement"> | string
   userId?: Prisma.StringFilter<"Movement"> | string
@@ -621,6 +652,7 @@ export type MovementCreateWithoutProductInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMovementsInput
 }
@@ -632,6 +664,7 @@ export type MovementUncheckedCreateWithoutProductInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   userId: string
 }
@@ -669,6 +702,7 @@ export type MovementCreateManyUserInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   productId: string
 }
@@ -680,6 +714,7 @@ export type MovementUpdateWithoutUserInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutMovementsNestedInput
 }
@@ -691,6 +726,7 @@ export type MovementUncheckedUpdateWithoutUserInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -702,6 +738,7 @@ export type MovementUncheckedUpdateManyWithoutUserInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -713,6 +750,7 @@ export type MovementCreateManyProductInput = {
   stockBefore: number
   stockAfter: number
   reason?: string | null
+  unitPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   userId: string
 }
@@ -724,6 +762,7 @@ export type MovementUpdateWithoutProductInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMovementsNestedInput
 }
@@ -735,6 +774,7 @@ export type MovementUncheckedUpdateWithoutProductInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -746,6 +786,7 @@ export type MovementUncheckedUpdateManyWithoutProductInput = {
   stockBefore?: Prisma.IntFieldUpdateOperationsInput | number
   stockAfter?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -759,6 +800,7 @@ export type MovementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   stockBefore?: boolean
   stockAfter?: boolean
   reason?: boolean
+  unitPrice?: boolean
   createdAt?: boolean
   productId?: boolean
   userId?: boolean
@@ -773,6 +815,7 @@ export type MovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   stockBefore?: boolean
   stockAfter?: boolean
   reason?: boolean
+  unitPrice?: boolean
   createdAt?: boolean
   productId?: boolean
   userId?: boolean
@@ -787,6 +830,7 @@ export type MovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   stockBefore?: boolean
   stockAfter?: boolean
   reason?: boolean
+  unitPrice?: boolean
   createdAt?: boolean
   productId?: boolean
   userId?: boolean
@@ -801,12 +845,13 @@ export type MovementSelectScalar = {
   stockBefore?: boolean
   stockAfter?: boolean
   reason?: boolean
+  unitPrice?: boolean
   createdAt?: boolean
   productId?: boolean
   userId?: boolean
 }
 
-export type MovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "quantity" | "stockBefore" | "stockAfter" | "reason" | "createdAt" | "productId" | "userId", ExtArgs["result"]["movement"]>
+export type MovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "quantity" | "stockBefore" | "stockAfter" | "reason" | "unitPrice" | "createdAt" | "productId" | "userId", ExtArgs["result"]["movement"]>
 export type MovementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -833,6 +878,7 @@ export type $MovementPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     stockBefore: number
     stockAfter: number
     reason: string | null
+    unitPrice: runtime.Decimal | null
     createdAt: Date
     productId: string
     userId: string
@@ -1267,6 +1313,7 @@ export interface MovementFieldRefs {
   readonly stockBefore: Prisma.FieldRef<"Movement", 'Int'>
   readonly stockAfter: Prisma.FieldRef<"Movement", 'Int'>
   readonly reason: Prisma.FieldRef<"Movement", 'String'>
+  readonly unitPrice: Prisma.FieldRef<"Movement", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"Movement", 'DateTime'>
   readonly productId: Prisma.FieldRef<"Movement", 'String'>
   readonly userId: Prisma.FieldRef<"Movement", 'String'>

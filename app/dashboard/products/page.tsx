@@ -27,6 +27,9 @@ type ApiProduct = {
   minStock: number;
   currentStock: number;
 
+  minSalePrice?: string | null;
+  maxSalePrice?: string | null;
+
   active: boolean;
 
   categoryId: string;
@@ -55,6 +58,8 @@ function apiToUi(p: ApiProduct): Product {
 
     minStock: Number(p.minStock ?? 0),
     currentStock: Number(p.currentStock ?? 0),
+    minSalePrice: p.minSalePrice ?? null,
+    maxSalePrice: p.maxSalePrice ?? null,
 
     active: !!p.active,
 
@@ -82,6 +87,8 @@ function uiToApi(d: ProductDraft) {
 
     minStock: Number(d.minStock ?? 0),
     currentStock: Number(d.currentStock ?? 0),
+    minSalePrice: d.minSalePrice ? String(d.minSalePrice).trim() : null,
+    maxSalePrice: d.maxSalePrice ? String(d.maxSalePrice).trim() : null,
 
     active: !!d.active,
 
@@ -217,7 +224,7 @@ export default function ProductsPage() {
   function onEdit(p: Product) {
     setMode("edit");
     setEditingId(p.id);
-
+    console.log("EDIT", p.minSalePrice, p.maxSalePrice);
     // ✅ tu Product NO tiene createdAt/updatedAt, así que no destructures eso
     const { id, code, ...rest } = p;
     setInitialDraft(rest);

@@ -155,6 +155,28 @@ export default function ProductsModal({
               />
             </Field>
 
+            <Field label="Precio mínimo (opcional)">
+              <input
+                className={inputCls}
+                value={draft.minSalePrice ?? ""}
+                onChange={(e) =>
+                  setDraft({ ...draft, minSalePrice: e.target.value.trim() ? e.target.value : null })
+                }
+                placeholder="Ej: 18.00"
+              />
+            </Field>
+
+            <Field label="Precio máximo (opcional)">
+              <input
+                className={inputCls}
+                value={draft.maxSalePrice ?? ""}
+                onChange={(e) =>
+                  setDraft({ ...draft, maxSalePrice: e.target.value.trim() ? e.target.value : null })
+                }
+                placeholder="Ej: 25.00"
+              />
+            </Field>
+
             <Field label="Stock mínimo">
               <input
                 type="number"

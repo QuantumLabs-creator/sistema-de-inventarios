@@ -3,7 +3,7 @@ import type { Prisma } from "@/src/generated/prisma/client";
 
 export class ProductEntity {
   static create(input: {
- 
+
     name: string;
     description: string | null;
 
@@ -13,6 +13,9 @@ export class ProductEntity {
     minStock: number;
     currentStock: number;
 
+    minSalePrice: Prisma.Decimal | null;
+    maxSalePrice: Prisma.Decimal | null;
+
     active: boolean;
 
     categoryId: string;
@@ -20,7 +23,7 @@ export class ProductEntity {
     unitId: string;
   }) {
     return {
-      
+
       name: input.name,
       description: input.description,
 
@@ -29,6 +32,9 @@ export class ProductEntity {
 
       minStock: input.minStock,
       currentStock: input.currentStock,
+
+      minSalePrice: input.minSalePrice,
+      maxSalePrice: input.maxSalePrice,
 
       active: input.active,
 

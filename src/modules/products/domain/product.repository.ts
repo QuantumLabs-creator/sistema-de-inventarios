@@ -13,6 +13,9 @@ export type ProductRecord = {
   minStock: number;
   currentStock: number;
 
+  minSalePrice: Prisma.Decimal | null;
+  maxSalePrice: Prisma.Decimal | null;
+
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +54,9 @@ export type CreateProductInput = {
 
   minStock?: unknown;
   currentStock?: unknown;
+
+  minSalePrice?: unknown; // opcional
+  maxSalePrice?: unknown;
 
   active?: unknown;
 
