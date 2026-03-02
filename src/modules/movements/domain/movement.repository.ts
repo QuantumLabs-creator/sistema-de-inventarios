@@ -1,3 +1,4 @@
+// src/modules/movements/domain/movement.repository.ts
 import type { Prisma } from "@/src/generated/prisma/client";
 
 export type MovementRecord = {
@@ -8,6 +9,9 @@ export type MovementRecord = {
   stockAfter: number;
   reason: string | null;
   createdAt: Date;
+
+  // ✅ nuevo
+  unitPrice: Prisma.Decimal | null;
 
   productId: string;
   userId: string;
@@ -22,8 +26,8 @@ export type MovementListResult = {
 };
 
 export type MovementListParams = {
-  q?: string;              // busca por código/nombre del producto / reason
-  type?: string;           // IN|OUT|ADJUSTMENT|RETURN
+  q?: string; // busca por código/nombre del producto / reason
+  type?: string; // IN|OUT|ADJUSTMENT|RETURN
   productId?: string;
   userId?: string;
   page: number;
@@ -36,12 +40,17 @@ export type CreateMovementInput = {
   reason?: unknown;
   productId: string;
   userId: string;
+
+  // ✅ nuevo (solo OUT usualmente)
+  unitPrice?: unknown;
 };
 
 export type UpdateMovementInput = {
-  reason?: string | null;
-};
+  reason?: unknown;
 
+  // ✅ permitir editar unitPrice (solo OUT; se valida en repo)
+  unitPrice?: unknown;
+};
 
 export interface MovementRepository {
   getById(id: string): Promise<MovementRecord | null>;

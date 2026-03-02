@@ -9,8 +9,15 @@ type ProductOption = {
   id: string;
   code: string;
   name: string;
+
   currentStock: number;
   minStock: number;
+
+  // ✅ precios (para OUT)
+  salePrice?: string | null;
+  minSalePrice?: string | null;
+  maxSalePrice?: string | null;
+
   unit?: { name: string; symbol: string | null } | null;
   category?: { name: string } | null;
 };
@@ -21,6 +28,11 @@ type ProductsApiItem = {
   name: string;
   currentStock: number;
   minStock: number;
+
+  salePrice?: string | null;
+  minSalePrice?: string | null;
+  maxSalePrice?: string | null;
+
   unit?: { id: string; name: string; symbol: string | null } | null;
   category?: { id: string; name: string } | null;
 };
@@ -37,6 +49,17 @@ function labelType(t: MovementType) {
   return "Ajuste (+)";
 }
 
+function toNum(v: unknown) {
+  const n = Number(String(v ?? "").trim().replace(",", "."));
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function moneyLabel(v: unknown) {
+  const n = toNum(v);
+  if (!Number.isFinite(n)) return "—";
+  return `S/ ${n.toFixed(2)}`;
+}
+
 export default function MovementNewPage() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [products, setProducts] = useState<ProductOption[]>([]);
@@ -46,6 +69,9 @@ export default function MovementNewPage() {
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState<string>("1");
   const [reason, setReason] = useState<string>("");
+
+  // ✅ solo para OUT
+  const [unitPrice, setUnitPrice] = useState<string>("");
 
   // userId (dev)
   const [userId, setUserId] = useState<string>("");
@@ -58,9 +84,7 @@ export default function MovementNewPage() {
   async function loadProducts() {
     setLoadingProducts(true);
     try {
-      const res = await fetch("/api/products?page=1&pageSize=500", {
-        cache: "no-store",
-      });
+      const res = await fetch("/api/products?page=1&pageSize=500", { cache: "no-store" });
       if (!res.ok) throw new Error("No se pudo cargar productos");
       const json = (await res.json()) as ProductsApiList;
 
@@ -71,6 +95,11 @@ export default function MovementNewPage() {
           name: p.name,
           currentStock: Number(p.currentStock ?? 0),
           minStock: Number(p.minStock ?? 0),
+
+          salePrice: p.salePrice ?? null,
+          minSalePrice: p.minSalePrice ?? null,
+          maxSalePrice: p.maxSalePrice ?? null,
+
           unit: p.unit ? { name: p.unit.name, symbol: p.unit.symbol } : null,
           category: p.category ? { name: p.category.name } : null,
         }))
@@ -84,43 +113,84 @@ export default function MovementNewPage() {
 
   useEffect(() => {
     loadProducts();
-
-    // userId dev (si lo tienes guardado)
     try {
       const u = localStorage.getItem("userId");
       if (u) setUserId(u);
     } catch {}
   }, []);
 
+  // ✅ cuando cambias producto o tipo, sugerimos un precio
+  useEffect(() => {
+    if (!selected) return;
+
+    if (type !== "OUT") {
+      setUnitPrice("");
+      return;
+    }
+
+    // prioridad: salePrice, luego minSalePrice, sino vacío
+    const suggested =
+      String(selected.salePrice ?? "").trim() ||
+      String(selected.minSalePrice ?? "").trim() ||
+      "";
+
+    setUnitPrice((prev) => (prev.trim() ? prev : suggested));
+  }, [type, selected]);
+
   function previewStock() {
     if (!selected) return null;
-    const q = Number(String(quantity ?? "0").replace(",", "."));
+    const q = toNum(quantity);
     if (!Number.isFinite(q) || q <= 0) return null;
 
     const before = selected.currentStock;
-    const after =
-      type === "OUT" ? before - q : before + q; // (IN/RETURN/ADJUSTMENT) => suma
+    const after = type === "OUT" ? before - q : before + q;
 
     return { before, after };
+  }
+
+  function validateOutPrice() {
+    if (type !== "OUT") return null;
+
+    const up = toNum(unitPrice);
+    if (!Number.isFinite(up) || up <= 0) return "Precio de salida inválido";
+
+    const minP = toNum(selected?.minSalePrice);
+    const maxP = toNum(selected?.maxSalePrice);
+
+    if (selected?.minSalePrice && Number.isFinite(minP) && up < minP) {
+      return `El precio debe ser >= ${moneyLabel(minP)}`;
+    }
+    if (selected?.maxSalePrice && Number.isFinite(maxP) && up > maxP) {
+      return `El precio debe ser <= ${moneyLabel(maxP)}`;
+    }
+    return null;
   }
 
   async function submit() {
     const pid = productId.trim();
     if (!pid) return toast.error("Selecciona un producto");
 
-    const q = Number(String(quantity ?? "").replace(",", "."));
+    const q = toNum(quantity);
     if (!Number.isFinite(q) || q <= 0) return toast.error("Cantidad inválida");
 
     const uid = userId.trim();
     if (!uid) return toast.error("Falta userId (dev)");
 
-    const payload = {
+    if (type === "OUT") {
+      const msg = validateOutPrice();
+      if (msg) return toast.error(msg);
+    }
+
+    const payload: any = {
       type,
       quantity: q,
       reason: reason.trim() || null,
       productId: pid,
       userId: uid,
     };
+
+    // ✅ mandamos unitPrice solo en OUT
+    if (type === "OUT") payload.unitPrice = unitPrice.trim();
 
     const tId = toast.loading("Registrando movimiento...");
     try {
@@ -140,12 +210,11 @@ export default function MovementNewPage() {
         description: `${labelType(type)} • ${selected?.code ?? ""} ${selected?.name ?? ""}`,
       });
 
-      // refrescar stock local (opcional)
       await loadProducts();
 
-      // reset
       setQuantity("1");
       setReason("");
+      if (type === "OUT") setUnitPrice("");
     } catch (e: any) {
       toast.dismiss(tId);
       toast.error("Error", { description: e?.message ?? "Intenta nuevamente" });
@@ -156,15 +225,14 @@ export default function MovementNewPage() {
     "w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10";
 
   const pv = previewStock();
+  const outPriceError = type === "OUT" ? validateOutPrice() : null;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Nuevo movimiento</h1>
-          <div className="text-xs opacity-70">
-            Registra ingresos, salidas, devoluciones o ajustes.
-          </div>
+          <div className="text-xs opacity-70">Registra ingresos, salidas, devoluciones o ajustes.</div>
         </div>
         <button
           onClick={loadProducts}
@@ -223,6 +291,30 @@ export default function MovementNewPage() {
                 placeholder="Ej: compra, consumo, ajuste inventario..."
               />
             </Field>
+
+            {/* ✅ Precio de salida */}
+            {type === "OUT" && (
+              <div className="sm:col-span-2">
+                <Field label="Precio de salida (unitario)">
+                  <input
+                    className={inputCls}
+                    value={unitPrice}
+                    onChange={(e) => setUnitPrice(e.target.value)}
+                    placeholder="Ej: 18.50"
+                  />
+                  <div className="text-[11px] opacity-70 mt-1">
+                    Rango permitido:{" "}
+                    <span className="font-medium">
+                      {moneyLabel(selected?.minSalePrice)} – {moneyLabel(selected?.maxSalePrice)}
+                    </span>{" "}
+                    (referencia: venta {moneyLabel(selected?.salePrice)})
+                  </div>
+                  {outPriceError && (
+                    <div className="text-[11px] text-red-600 mt-1">{outPriceError}</div>
+                  )}
+                </Field>
+              </div>
+            )}
 
             {/* userId dev */}
             <div className="sm:col-span-2">
@@ -290,6 +382,22 @@ export default function MovementNewPage() {
               <div className="opacity-80">
                 Stock mínimo: <span className="font-medium tabular-nums">{selected.minStock}</span>
               </div>
+
+              {type === "OUT" && (
+                <div className="mt-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-muted)] p-3">
+                  <div className="text-xs font-semibold opacity-80 mb-2">Precio aplicado</div>
+                  <div className="flex items-center justify-between">
+                    <span className="opacity-70">Unitario</span>
+                    <span className="font-semibold tabular-nums">{moneyLabel(unitPrice)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="opacity-70">Total</span>
+                    <span className="font-semibold tabular-nums">
+                      {moneyLabel(toNum(unitPrice) * toNum(quantity))}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {pv && (
                 <div className="mt-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-muted)] p-3">

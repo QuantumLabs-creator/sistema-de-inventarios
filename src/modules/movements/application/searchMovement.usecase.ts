@@ -1,18 +1,24 @@
 // src/modules/movements/application/searchMovement.usecase.ts
-import type { MovementRepository, MovementListParams } from "../domain/movement.repository";
+import type { MovementRepository } from "../domain/movement.repository";
+import type { MovementQueryDTO } from "./dtos/movement.dto";
 
-export class SearchMovementUseCase {
+export class SearchMovementsUseCase {
   constructor(private readonly repo: MovementRepository) {}
 
-  async execute(params: MovementListParams) {
-    const page = Math.max(1, Number(params.page ?? 1));
-    const pageSize = Math.min(500, Math.max(5, Number(params.pageSize ?? 50)));
+  async execute(query: MovementQueryDTO) {
+    const q = (query.q ?? "").trim();
+    const type = (query.type ?? "").trim();
+    const productId = (query.productId ?? "").trim();
+    const userId = (query.userId ?? "").trim();
+
+    const page = Math.max(1, Number(query.page ?? 1));
+    const pageSize = Math.min(500, Math.max(5, Number(query.pageSize ?? 50)));
 
     return this.repo.list({
-      q: (params.q ?? "").trim(),
-      type: (params.type ?? "").trim(),
-      productId: (params.productId ?? "").trim(),
-      userId: (params.userId ?? "").trim(),
+      q: q || undefined,
+      type: type || undefined,
+      productId: productId || undefined,
+      userId: userId || undefined,
       page,
       pageSize,
     });

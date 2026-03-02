@@ -1,5 +1,8 @@
 import type { MovementRepository } from "../domain/movement.repository";
-import { normalizeText } from "../domain/movement.rules";
+import {
+  normalizeText,
+  normalizeMoneyOptional,
+} from "../domain/movement.rules";
 import { assertUpdateMovementDTO, type UpdateMovementDTO } from "./dtos/movement.dto";
 
 export class UpdateMovementUseCase {
@@ -12,12 +15,16 @@ export class UpdateMovementUseCase {
     assertUpdateMovementDTO(input);
     const dto = input as UpdateMovementDTO;
 
-    // ✅ solo motivo/observación
     const patch = {
       reason: dto.reason !== undefined ? (normalizeText(dto.reason) ?? null) : undefined,
+
+      // ✅ opcional: cambiar precio aplicado (repo valida que sea OUT y rango)
+      unitPrice:
+        dto.unitPrice !== undefined
+          ? normalizeMoneyOptional(dto.unitPrice, "unitPrice")
+          : undefined,
     };
 
-    // repo debe tener updateReason (abajo te lo dejo)
     return this.repo.update(mid, patch);
   }
 }

@@ -15,6 +15,9 @@ export type MovementDTO = {
   reason: string | null;
   createdAt: string;
 
+  // ✅ nuevo (solo aplica realmente en OUT)
+  unitPrice: string | null;
+
   productId: string;
   userId: string;
 
@@ -29,6 +32,9 @@ export type CreateMovementDTO = {
 
   productId: string;
   userId: string;
+
+  // ✅ nuevo: precio aplicado para OUT (si no mandas, backend puede usar salePrice)
+  unitPrice?: unknown;
 };
 
 export type MovementQueryDTO = {
@@ -42,19 +48,30 @@ export type MovementQueryDTO = {
 
 export type UpdateMovementDTO = {
   reason?: string | null;
+
+  // ✅ permitir editar precio aplicado (solo OUT; el repo/usecase validará)
+  unitPrice?: unknown;
 };
 
-export function assertUpdateMovementDTO(
-  input: unknown
-): asserts input is UpdateMovementDTO {
+export function assertUpdateMovementDTO(input: unknown): asserts input is UpdateMovementDTO {
   if (!input || typeof input !== "object") {
     throw new Error("Body inválido");
   }
 
   const x = input as any;
 
-  if (x.reason !== undefined && typeof x.reason !== "string") {
+  if (x.reason !== undefined && x.reason !== null && typeof x.reason !== "string") {
     throw new Error("reason inválido");
+  }
+
+  // unitPrice puede venir como string/number/null
+  if (
+    x.unitPrice !== undefined &&
+    x.unitPrice !== null &&
+    typeof x.unitPrice !== "string" &&
+    typeof x.unitPrice !== "number"
+  ) {
+    throw new Error("unitPrice inválido");
   }
 }
 
@@ -70,4 +87,19 @@ export function assertCreateMovementDTO(input: unknown): asserts input is Create
   if (!toStr(x.userId)) throw new Error("userId requerido");
 
   if (x.quantity === undefined || toStr(x.quantity) === "") throw new Error("quantity requerido");
+
+  // reason opcional string|null
+  if (x.reason !== undefined && x.reason !== null && typeof x.reason !== "string") {
+    throw new Error("reason inválido");
+  }
+
+  // unitPrice opcional (solo OUT normalmente), pero validamos tipo aquí igual
+  if (
+    x.unitPrice !== undefined &&
+    x.unitPrice !== null &&
+    typeof x.unitPrice !== "string" &&
+    typeof x.unitPrice !== "number"
+  ) {
+    throw new Error("unitPrice inválido");
+  }
 }
