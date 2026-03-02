@@ -1,5 +1,5 @@
 // app/api/suppliers/[id]/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { PrismaSupplierRepository } from "@/src/modules/suppliers/infrastructure/supplier.repo";
 import { GetSupplierUseCase } from "@/src/modules/suppliers/application/getSupplier.usecase";
@@ -8,10 +8,14 @@ import { DeleteSupplierUseCase } from "@/src/modules/suppliers/application/delet
 
 const repo = new PrismaSupplierRepository();
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const uc = new GetSupplierUseCase(repo);
-    const row = await uc.execute(params.id);
+    const row = await uc.execute(id);
     return NextResponse.json(row);
   } catch (e: any) {
     return NextResponse.json(
@@ -22,13 +26,14 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 }
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+   req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
     const uc = new UpdateSupplierUseCase(repo);
-    const updated = await uc.execute(params.id, body);
+    const updated = await uc.execute(id, body);
     return NextResponse.json(updated);
   } catch (e: any) {
     return NextResponse.json(
@@ -39,12 +44,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+   _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const uc = new DeleteSupplierUseCase(repo);
-    await uc.execute(params.id);
+    await uc.execute(id);
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json(
