@@ -44,12 +44,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+     const { id } = await params;
     const uc = new DeleteCategoryUseCase(repo);
-    await uc.execute(params.id);
+    await uc.execute(id);
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json(
